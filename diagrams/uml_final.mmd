@@ -14,8 +14,13 @@ classDiagram
         +str priority
         +str recurring
         +str notes
+        +str status
+        +str start_time
+        +date due_date
         +__str__() str
         +is_high_priority() bool
+        +next_occurrence() Task
+        +mark_complete() Task
     }
 
     class Schedule {
@@ -23,22 +28,32 @@ classDiagram
         +int available_minutes_per_day
         +dict preferences
         +Pet pet
-        +list tasks
+        +list~Task~ tasks
         +date date
-        +add_task(task) None
+        +add_task(task) str
+        +check_conflict(task) str
         +remove_task(task) None
+        +complete_task(task) Task
         +get_remaining_time() int
     }
 
     class Planner {
         +Schedule schedule
         +sort_tasks() list
+        +sort_by_time() list
+        +filter_by(status, pet_name) list
         +filter_tasks() list
         +assign_time_slots() list
         +generate_plan() list
         +explain_plan() str
+        +find_conflicts(other_schedules) list
+        +explain_conflicts(other_schedules) str
+        -_time_range(task)$ tuple
     }
 
     Schedule "1" --> "1" Pet : for
     Schedule "1" o-- "many" Task : contains
-    Planner "1" --> "1" Schedule : uses
+    Task "1" ..> "0..1" Task : generates next occurrence
+    Planner "1" --> "1" Schedule : reads/updates
+    Planner "1" ..> "0..*" Schedule : checks conflicts across
+    Schedule ..> Planner : uses _time_range()

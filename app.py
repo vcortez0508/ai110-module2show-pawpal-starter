@@ -51,6 +51,8 @@ else:
         priority = st.selectbox("Priority", ["high", "medium", "low"])
         recurring = st.selectbox("Recurring", ["daily", "weekly", "none"])
 
+    start_time = st.text_input("Start time (HH:MM, optional)", value="")
+
     if st.button("Add Task"):
         task = Task(
             name=task_name,
@@ -58,15 +60,21 @@ else:
             duration_minutes=int(duration),
             priority=priority,
             recurring=recurring,
+            start_time=start_time,
         )
-        st.session_state.schedule.add_task(task)
+        conflict_warning = st.session_state.schedule.add_task(task)
         st.success(f"Added: {task_name} ({duration}min) [{priority}]")
+        if conflict_warning:
+            st.warning(f"⚠️ Scheduling conflict: {conflict_warning}")
 
     # --- Current Task List ---
     if st.session_state.schedule.tasks:
         st.markdown("### Current Tasks")
+        planner = Planner(st.session_state.schedule)
+        ordered_tasks = planner.sort_by_time()
         task_data = [
             {
+                "Time": t.start_time or "—",
                 "Task": t.name,
                 "Category": t.category,
                 "Duration": f"{t.duration_minutes}min",
@@ -74,12 +82,24 @@ else:
                 "Recurring": t.recurring,
                 "Status": t.status,
             }
-            for t in st.session_state.schedule.tasks
+            for t in ordered_tasks
         ]
         st.table(task_data)
         total = sum(t.duration_minutes for t in st.session_state.schedule.tasks)
         remaining = st.session_state.schedule.available_minutes_per_day - total
         st.caption(f"Total: {total}min used | {remaining}min remaining")
+
+        # --- Conflict Summary ---
+        conflicts = planner.find_conflicts()
+        if conflicts:
+            st.warning(f"⚠️ {len(conflicts)} scheduling conflict(s) found among current tasks:")
+            for pet_a, task_a, pet_b, task_b in conflicts:
+                st.markdown(
+                    f"- **{task_a.name}** ({task_a.start_time}) overlaps "
+                    f"**{task_b.name}** ({task_b.start_time}) for {pet_a}"
+                )
+        else:
+            st.success("✅ No scheduling conflicts among current tasks.")
     else:
         st.info("No tasks yet. Add one above.")
 
@@ -113,3 +133,9 @@ if st.button("Generate Schedule"):
             ]
             st.table(plan_data)
             st.info(planner.explain_plan())
+
+            conflicts = planner.find_conflicts()
+            if conflicts:
+                st.warning(planner.explain_conflicts())
+            else:
+                st.success("No scheduling conflicts in this plan.")

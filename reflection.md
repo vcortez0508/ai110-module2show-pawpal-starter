@@ -55,12 +55,16 @@
 **a. How you used AI**
 
 - How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
+    I used AI mainly for the implementation of logic and algorithms, refactoring, case testing and understanding why we are implementing the logic we are using. Mainly the things I was most unfamiliar with. 
 - What kinds of prompts or questions were most helpful?
+    Usually questions similar to "explain to me what x is  doing and why are we implementing it". Thsese questions help me gain a deeper understanding of what is happening and aiding my learning development.
 
 **b. Judgment and verification**
 
 - Describe one moment where you did not accept an AI suggestion as-is.
+    When focusing on testing. The AI agent wanted to add many tests that I was unsure of. 
 - How did you evaluate or verify what the AI suggested?
+    I made sure to ask the agent to "give me a brief description" of what the tests that were proposed were covering and verified them.
 
 ---
 
@@ -80,12 +84,11 @@ I'm fairly confident in the core logic since all 15 tests pass and cover both no
 
 **a. What went well**
 
-- What part of this project are you most satisfied with?
-
+I'm most satisfied with the conflict detection and recurrence logic, since they went from nothing in the original skeleton to fully tested, working behavior across both the CLI and Streamlit UI. I was also excited throughout the process since its my first time building something from nothing. 
 **b. What you would improve**
 
-- If you had another iteration, what would you improve or redesign?
+If I had another iteration, I'd revisit the circular dependency where `Schedule.check_conflict()` calls `Planner._time_range()`, since Schedule and Planner ending up dependent on each other in both directions is a design smell I only caught while updating the UML after the fact. I'd also address the `Task` value-equality issue affecting `remove_task`/`filter_tasks` that came up during testing but that I deferred rather than fixed.
 
 **c. Key takeaway**
 
-- What is one important thing you learned about designing systems or working with AI on this project?
+The biggest lesson was that a UML diagram is a starting hypothesis, not a contract — real implementation revealed things like the Owner class being unnecessary and a two-way dependency between Schedule and Planner that no amount of upfront design would have caught. Working with AI was most useful when I asked it to explain the "why" behind a suggestion rather than just accepting the code, since that's what let me push back on things like the overly broad test suite it first proposed. I was also able to learn a lot more of what goes into building actual software ( design, implementation, refactoring, testing, etc...) which were things I never had exposure to before.
