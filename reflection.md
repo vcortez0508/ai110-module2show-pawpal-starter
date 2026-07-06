@@ -38,13 +38,16 @@
 **a. Constraints and priorities**
 
 - What constraints does your scheduler consider (for example: time, priority, preferences)?
+    Priority, Time budget, overlap and how recurrent a task is
 - How did you decide which constraints mattered most?
+    I prioritized constraints in the order they'd actually cause harm if ignored: priority first, because a missed high-priority task (like medicine) has real consequences while a skipped low-priority one (like extra playtime) doesn't. Time budget second, since it's the hard limiting resource — there's no point planning tasks that can't physically fit in the day. Overlap/conflict checking came third as a safety net once the core plan existed, to catch cases where two tasks land at the same time. 
 
 **b. Tradeoffs**
 
 - Describe one tradeoff your scheduler makes.
+    One of the tradeoffs scheduler makes is within our "find_conflicts" algo. It currently has a good balance of performance and readability but could definitely be optimized for much better performance. With help of the chat agent, it was decided to keep as-is rather than optimizing for performance.
 - Why is that tradeoff reasonable for this scenario?
-
+    Because of the scale of the application. It will most likely only handle a handful of daily tasks and isn't worth the added complexity. Readability was prioritized over an uneccesa
 ---
 
 ## 3. AI Collaboration
@@ -65,13 +68,11 @@
 
 **a. What you tested**
 
-- What behaviors did you test?
-- Why were these tests important?
+I built a 15-test suite (`tests/test_pawpal.py`) covering three main areas plus edge cases. **Sorting correctness**: verified `sort_by_time()` returns tasks in chronological order, and that untimed tasks are placed consistently. **Recurring logic**: confirmed that marking a daily task complete generates a new pending task due the next day, weekly tasks advance by 7 days, non-recurring tasks return `None`, and that completed recurring tasks are correctly re-added to the schedule. **Conflict detection**: verified that overlapping and identical start times are flagged with a warning, that back-to-back tasks (no actual overlap) are correctly *not* flagged, and that untimed tasks never trigger false conflicts. I also tested edge cases like an empty schedule (no tasks, full budget) and a task whose duration exactly fills the remaining time budget. These were important because sorting, recurrence, and conflict detection are the core logic the whole scheduler depends on — a silent bug in any of them would produce a plan that looks correct but is subtly wrong (e.g., double-booked pets or recurring tasks silently disappearing).
 
 **b. Confidence**
 
-- How confident are you that your scheduler works correctly?
-- What edge cases would you test next if you had more time?
+I'm fairly confident in the core logic since all 15 tests pass and cover both normal and boundary behavior. I'd still want to test a couple of trickier edge cases with more time: tasks with malformed or non-zero-padded `start_time` strings (e.g. `"9:00"` vs `"09:00"`), and how `remove_task`/`filter_tasks` behave when two distinct tasks have identical field values (since `Task` uses value equality, this could cause the wrong task to be removed or filtered).
 
 ---
 
