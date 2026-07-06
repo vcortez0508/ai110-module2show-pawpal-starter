@@ -52,11 +52,12 @@ class Schedule:
 
     def remove_task(self, task: Task) -> None:
         """Remove a task from the schedule's task list."""
-        pass
+        if task in self.tasks:
+            self.tasks.remove(task)
 
     def get_remaining_time(self) -> int:
         """Return the minutes remaining after subtracting all task durations from the daily budget."""
-        pass
+        return self.available_minutes_per_day - sum(t.duration_minutes for t in self.tasks)
 
 
 class Planner:
@@ -65,21 +66,48 @@ class Planner:
 
     def sort_tasks(self) -> list:
         """Return tasks sorted by priority (high → medium → low)."""
-        pass
+        order = {"high": 0, "medium": 1, "low": 2}
+        return sorted(self.schedule.tasks, key=lambda t: order.get(t.priority, 3))
 
     def filter_tasks(self) -> list:
         """Return only the tasks that fit within the available time budget."""
-        pass
+        sorted_tasks = self.sort_tasks()
+        budget = self.schedule.available_minutes_per_day
+        selected, total = [], 0
+        for task in sorted_tasks:
+            if total + task.duration_minutes <= budget:
+                selected.append(task)
+                total += task.duration_minutes
+        return selected
 
     def assign_time_slots(self) -> list:
         """Return tasks with a calculated start time based on order and duration."""
-        pass
+        filtered = self.filter_tasks()
+        hour, minute = 8, 0
+        slots = []
+        for task in filtered:
+            slots.append({"time": f"{hour:02d}:{minute:02d}", "task": task})
+            minute += task.duration_minutes
+            hour += minute // 60
+            minute %= 60
+        return slots
 
     def generate_plan(self) -> list:
         """Return the final ordered, time-slotted plan by running the full pipeline."""
         # pipeline: sort_tasks() → filter_tasks() → assign_time_slots()
-        pass
+        return self.assign_time_slots()
 
     def explain_plan(self) -> str:
         """Return a human-readable explanation of why tasks were ordered and filtered as they were."""
-        pass
+        filtered = self.filter_tasks()
+        all_tasks = self.schedule.tasks
+        dropped = [t for t in all_tasks if t not in filtered]
+        total = sum(t.duration_minutes for t in filtered)
+        lines = [
+            f"Tasks were sorted by priority (high → medium → low) and scheduled starting at 08:00.",
+            f"{len(filtered)} of {len(all_tasks)} tasks fit within the {self.schedule.available_minutes_per_day}min budget ({total}min used).",
+        ]
+        if dropped:
+            names = ", ".join(t.name for t in dropped)
+            lines.append(f"Dropped due to time constraints: {names}.")
+        return " ".join(lines)
