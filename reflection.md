@@ -5,11 +5,20 @@
 **a. Initial design**
 
 - Briefly describe your initial UML design.
+    My original UML design was not very straightforward. I included a few unnecessary classes that could be merged into other classes.
 - What classes did you include, and what responsibilities did you assign to each?
+    During the first UML design I had:
+    * Owner - Holds descriptive data about the customer (Pet owner).
+    * Pet - Holds descriptive data about the pet (who is the care for?).
+    * Task - Holds everything about a single care activity — what it is, how long it takes, how important it is, and how often it recurs.
+    * Schedule - Hold all the inputs the planner needs and acts as the data container for a planning session — the owner's constraints, the pet, the task list, and the date
+    * Planner - It reads the Schedule, sorts tasks by priority, filters out tasks that won't fit in the time budget, assigns start times, and explains its reasoning.
+
 
 **b. Design changes**
 
 - Did your design change during implementation?
+
 - If yes, describe at least one change and why you made it.
 
 ---

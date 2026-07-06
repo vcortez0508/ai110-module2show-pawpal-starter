@@ -1,0 +1,44 @@
+classDiagram
+    class Pet {
+        +str name
+        +str species
+        +str breed
+        +int age
+        +__str__() str
+    }
+
+    class Task {
+        +str name
+        +str category
+        +int duration_minutes
+        +str priority
+        +str recurring
+        +str notes
+        +__str__() str
+        +is_high_priority() bool
+    }
+
+    class Schedule {
+        +str owner_name
+        +int available_minutes_per_day
+        +dict preferences
+        +Pet pet
+        +list tasks
+        +date date
+        +add_task(task) None
+        +remove_task(task) None
+        +get_remaining_time() int
+    }
+
+    class Planner {
+        +Schedule schedule
+        +sort_tasks() list
+        +filter_tasks() list
+        +assign_time_slots() list
+        +generate_plan() list
+        +explain_plan() str
+    }
+
+    Schedule "1" --> "1" Pet : for
+    Schedule "1" o-- "many" Task : contains
+    Planner "1" --> "1" Schedule : uses
