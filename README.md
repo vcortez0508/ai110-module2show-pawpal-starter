@@ -79,14 +79,17 @@ Sample test output:
 
 ## 📐 Smarter Scheduling
 
-> Fill in once you've implemented scheduling logic.
-
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+| Priority sorting | `Planner.sort_tasks()` | Orders tasks high → medium → low before filtering or slotting. |
+| Time-based sorting | `Planner.sort_by_time()` | Sorts tasks by their `start_time` ("HH:MM") string. |
+| Status / pet filtering | `Planner.filter_by(status, pet_name)` | Returns tasks matching a given `status` ("pending"/"complete") and/or pet name. |
+| Budget filtering | `Planner.filter_tasks()` | Greedily keeps priority-sorted tasks that still fit within `available_minutes_per_day`; drops the rest. |
+| Time-slot assignment | `Planner.assign_time_slots()` | Assigns sequential start times to filtered tasks based on cumulative duration. |
+| Full plan generation | `Planner.generate_plan()` | Runs the sort → filter → assign-slots pipeline end to end. |
+| Plan explanation | `Planner.explain_plan()` | Produces a human-readable summary of what was scheduled and what was dropped, and why. |
+| Conflict handling | `Planner._time_range()`, `Planner.find_conflicts()`, `Planner.explain_conflicts()`, `Schedule.check_conflict()` | Detects overlapping `[start, start+duration)` ranges for tasks within one pet's schedule and across other pets' schedules; `Schedule.add_task()` also runs a lightweight same-schedule check and returns a warning string (rather than raising) when a new task overlaps an existing one. |
+| Recurring tasks | `Task.next_occurrence()`, `Task.mark_complete()`, `Schedule.complete_task()` | Completing a "daily" or "weekly" task automatically generates the next pending occurrence using `datetime.timedelta` (1 day or 1 week out) and adds it back onto the schedule. |
 
 ## 📸 Demo Walkthrough
 
