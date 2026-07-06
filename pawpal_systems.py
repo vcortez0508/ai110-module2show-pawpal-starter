@@ -36,7 +36,7 @@ class Schedule:
     pet: Pet
     date: date
     preferences: dict = field(default_factory=dict)
-    tasks: list = field(default_factory=list)
+    tasks: list[Task] = field(default_factory=list)
 
     def add_task(self, task: Task) -> None:
         pass
@@ -62,6 +62,7 @@ class Planner:
         pass
 
     def generate_plan(self) -> list:
+        # pipeline: sort_tasks() → filter_tasks() → assign_time_slots()
         pass
 
     def explain_plan(self) -> str:

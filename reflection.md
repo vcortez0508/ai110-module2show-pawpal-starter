@@ -19,7 +19,17 @@
 
 - Did your design change during implementation?
 
+    Yes.
+
 - If yes, describe at least one change and why you made it.
+
+    **Change 1 — Removed the `Owner` class**
+
+    The original design had a standalone `Owner` class with `name`, `available_minutes_per_day`, and `preferences`. During review I realized `Owner` had no methods and was only ever accessed through `Schedule`. Keeping it as a separate class added an unnecessary layer of indirection, so its attributes were folded directly into `Schedule`. This simplified the design from 5 classes to 4 without losing any information.
+
+    **Change 2 — Typed `tasks` as `list[Task]`**
+
+    The initial skeleton defined `tasks` as a plain untyped `list`. During review this was identified as a potential bottleneck — nothing would prevent invalid data from being added to the task list silently. Changing it to `list[Task]` makes the contract explicit and catches type mismatches early.
 
 ---
 
